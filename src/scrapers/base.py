@@ -11,19 +11,25 @@ class BaseScraper(ABC):
         pass
 
 def ensure_columns(df: pd.DataFrame) -> pd.DataFrame:
-    """Garante que o DataFrame tenha as colunas padrão na ordem correta"""
-    required_columns = [
-        'league', 'season', 'player', 'team', 'position', 
-        'appearances', 'fouls', 'fouls_drawn', 'yellow_cards', 
-        'red_cards', 'minutes', 'source'
+    """Garante que o DataFrame tenha todas as colunas necessárias na ordem correta"""
+    required = [
+        'league','season','player','team','position',
+        'appearances','fouls','fouls_drawn','yellow_cards','red_cards','minutes',
+        'source'
     ]
-    
-    # Adiciona colunas faltantes com valores None
-    for col in required_columns:
-        if col not in df.columns:
-            df[col] = None
-    
-    # Reordena as colunas
-    df = df[required_columns]
-    
-    return df
+    out = df.copy()
+    for col in required:
+        if col not in out.columns:
+            out[col] = None
+
+    # preenchimentos mínimos
+    for num in ['appearances','fouls','fouls_drawn','yellow_cards','red_cards','minutes']:
+        out[num] = pd.to_numeric(out[num], errors='coerce').fillna(0.0)
+
+    for txt in ['league','season','player','team','position','source']:
+        out[txt] = out[txt].astype(str).str.strip().fillna('')
+
+    # filtrar linhas inválidas (sem player/team)
+    out = out[(out['player']!='') & (out['team']!='')]
+
+    return out[required]
