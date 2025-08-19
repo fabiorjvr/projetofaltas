@@ -3,31 +3,52 @@
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115.6-green.svg)](https://fastapi.tiangolo.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-13+-blue.svg)](https://www.postgresql.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-1.37.1-red.svg)](https://streamlit.io/)
+[![React](https://img.shields.io/badge/React-18+-61DAFB.svg)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6.svg)](https://www.typescriptlang.org/)
+[![Machine Learning](https://img.shields.io/badge/ML-XGBoost-orange.svg)](https://xgboost.readthedocs.io/)
 
-Um sistema completo de análise de faltas no futebol que coleta dados através de web scraping, armazena em PostgreSQL e fornece uma API REST e dashboard interativo para visualização e análise dos dados.
+Um sistema completo de análise de faltas no futebol com **Machine Learning**, **PWA** e **API REST**. Coleta dados através de web scraping, processa com algoritmos de ML para predições e oferece uma interface moderna React com animações e funcionalidades offline.
 
 ## 🚀 Funcionalidades
 
-### 📊 Web Scraping
-- **Coleta automatizada** de dados de faltas do FBRef
+### 🤖 Machine Learning & IA
+- **Pipeline ML completo** com XGBoost para predição de faltas e cartões
+- **Clustering de perfis** de jogadores com algoritmos não-supervisionados
+- **Detecção de anomalias** em comportamento de jogadores
+- **MLflow** para versionamento e serving de modelos
+- **Predições em tempo real** via API REST
+- **Métricas de performance** e monitoramento de modelos
+
+### 📊 Web Scraping & ETL
+- **Coleta automatizada** de dados do FBRef com Selenium
 - **Suporte a múltiplas ligas**: Premier League, La Liga, Serie A (Brasil)
-- **Limpeza robusta** de dados com filtros anti-header
-- **Deduplicação automática** para evitar registros duplicados
-- **Upsert atômico** com PostgreSQL para alta performance
+- **Pipeline ETL robusto** com limpeza e validação de dados
+- **Deduplicação automática** e upsert atômico
+- **Tratamento de erros** e retry automático
 
 ### 🔌 API REST (FastAPI)
-- **Endpoints RESTful** para consulta de dados
-- **Filtros avançados** por liga, temporada, time e estatísticas
-- **Paginação** e ordenação personalizável
+- **Autenticação JWT** com middleware de segurança
+- **Rate limiting** e validações Pydantic robustas
+- **Endpoints ML** para predições e análises
 - **Documentação automática** com Swagger UI
-- **Validação** com Pydantic schemas
+- **CORS configurado** para integração frontend
+- **Logging estruturado** e monitoramento
 
-### 📈 Dashboard (Streamlit)
-- **Interface interativa** para visualização de dados
-- **Gráficos dinâmicos** com Plotly
-- **Filtros em tempo real**
+### 💻 Frontend PWA (React 18 + TypeScript)
+- **Progressive Web App** com funcionalidades offline
+- **Interface moderna** com Tailwind CSS e animações Framer Motion
+- **Gerenciamento de estado** com Zustand e React Query
+- **Componentes reutilizáveis** e design system
+- **Responsivo** para desktop, tablet e mobile
+- **Notificações push** e sincronização em background
+- **Instalável** como app nativo
+
+### 📈 Dashboard & Analytics
+- **Visualizações interativas** com gráficos dinâmicos
+- **Filtros em tempo real** e busca avançada
 - **Análises estatísticas** detalhadas
+- **Exportação de dados** em múltiplos formatos
+- **Dashboards personalizáveis** por usuário
 
 ## 🏗️ Arquitetura
 
@@ -40,23 +61,42 @@ football-fouls-analytics/
 │   ├── database/           # Modelos e configuração do banco
 │   │   ├── models.py       # Modelos SQLAlchemy
 │   │   └── connection.py   # Configuração de conexão
+│   ├── ml/                # Pipeline Machine Learning
+│   │   ├── models/        # Modelos ML (XGBoost, Clustering)
+│   │   ├── preprocessing/ # Preprocessamento de dados
+│   │   ├── training/      # Scripts de treinamento
+│   │   └── inference/     # Inferência e predições
 │   └── cli.py             # Interface de linha de comando
 ├── backend/
 │   └── app/               # API FastAPI
 │       ├── main.py        # Aplicação principal
-│       ├── core/          # Configurações
+│       ├── core/          # Configurações e segurança
 │       ├── api/v1/        # Endpoints da API
-│       └── schemas/       # Schemas Pydantic
-├── dashboard/             # Dashboard Streamlit
-└── requirements.txt       # Dependências
+│       ├── schemas/       # Schemas Pydantic
+│       ├── auth/          # Autenticação JWT
+│       └── ml/            # Endpoints ML
+├── frontend/              # PWA React + TypeScript
+│   ├── src/
+│   │   ├── components/    # Componentes React
+│   │   ├── pages/         # Páginas da aplicação
+│   │   ├── store/         # Gerenciamento de estado (Zustand)
+│   │   ├── hooks/         # Custom hooks
+│   │   └── utils/         # Utilitários
+│   ├── public/            # Assets estáticos
+│   └── package.json       # Dependências frontend
+├── dashboard/             # Dashboard Streamlit (legacy)
+├── mlflow/               # Experimentos e modelos ML
+└── requirements.txt       # Dependências Python
 ```
 
 ## 🛠️ Instalação
 
 ### Pré-requisitos
 - Python 3.8+
+- Node.js 18+ e npm
 - PostgreSQL 13+
 - Chrome/Chromium (para web scraping)
+- MLflow (para ML pipeline)
 
 ### 1. Clone o repositório
 ```bash
@@ -75,19 +115,26 @@ python -m venv venv
 source venv/bin/activate
 ```
 
-### 3. Instale as dependências
+### 3. Instale as dependências do backend
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configure o banco de dados
+### 4. Instale as dependências do frontend
+```bash
+cd frontend
+npm install
+cd ..
+```
+
+### 5. Configure o banco de dados
 
 Crie um arquivo `.env` na raiz do projeto:
 ```env
 DATABASE_URL=postgresql://usuario:senha@localhost:5432/football_fouls
 ```
 
-### 5. Execute as migrações
+### 6. Execute as migrações
 ```bash
 python -c "from src.database.models import create_tables; create_tables()"
 ```
@@ -103,7 +150,7 @@ python -m src.cli --league "La Liga" --season "2024-2025"
 python -m src.cli --league "Serie A" --season "2024-2025"
 ```
 
-### API REST
+### API REST (Backend)
 
 #### Iniciar o servidor da API:
 ```bash
@@ -115,11 +162,38 @@ A API estará disponível em: http://localhost:8000
 
 **Documentação interativa:** http://localhost:8000/docs
 
+### Frontend PWA
+
+#### Iniciar o frontend:
+```bash
+cd frontend
+npm run dev
+```
+
+O frontend estará disponível em: http://localhost:3000
+
+**Funcionalidades PWA:**
+- Interface moderna e responsiva
+- Funcionalidades offline
+- Instalável como app nativo
+- Animações fluidas com Framer Motion
+- Gerenciamento de estado com Zustand
+
 #### Endpoints principais:
 
+**Autenticação:**
+- **POST /api/v1/auth/login** - Login e obtenção de token JWT
+- **POST /api/v1/auth/register** - Registro de novo usuário
+
+**Dados:**
 - **GET /api/v1/players** - Lista jogadores com filtros
 - **GET /api/v1/stats/top-fouls** - Top jogadores com mais faltas
 - **GET /api/v1/teams/fouls-summary** - Resumo de faltas por time
+
+**Machine Learning:**
+- **POST /api/v1/ml/predict/fouls** - Predição de faltas
+- **POST /api/v1/ml/predict/cards** - Predição de cartões
+- **GET /api/v1/ml/clusters/players** - Clustering de jogadores
 
 #### Exemplos de uso:
 
@@ -226,12 +300,45 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para de
 - [Streamlit](https://streamlit.io/) pelo framework de dashboard
 - [Selenium](https://selenium.dev/) pela automação web
 
+## 🚀 Tecnologias Utilizadas
+
+### Backend
+- **Python 3.8+** - Linguagem principal
+- **FastAPI** - Framework web moderno e rápido
+- **SQLAlchemy** - ORM para PostgreSQL
+- **Pydantic** - Validação de dados
+- **JWT** - Autenticação segura
+- **XGBoost** - Machine Learning
+- **MLflow** - MLOps e versionamento de modelos
+- **Selenium** - Web scraping
+
+### Frontend
+- **React 18** - Biblioteca UI moderna
+- **TypeScript** - Tipagem estática
+- **Vite** - Build tool rápido
+- **Tailwind CSS** - Framework CSS utilitário
+- **Framer Motion** - Animações fluidas
+- **Zustand** - Gerenciamento de estado
+- **React Query** - Cache e sincronização de dados
+- **PWA** - Progressive Web App
+
+### Infraestrutura
+- **PostgreSQL** - Banco de dados relacional
+- **Docker** - Containerização
+- **Nginx** - Proxy reverso
+- **GitHub Actions** - CI/CD
+
 ## 📞 Contato
 
-**Fábio Vieira** - [@fabiorjvr](https://github.com/fabiorjvr)
+**Fábio Rosestolato Ferreira**
+- 📧 Email: fabiorjvr@gmail.com
+- 📱 Telefone: (21) 98030-6189
+- 🐙 GitHub: [@fabiorjvr](https://github.com/fabiorjvr)
 
 **Link do Projeto:** [https://github.com/fabiorjvr/projetofaltas](https://github.com/fabiorjvr/projetofaltas)
 
 ---
+
+*Desenvolvido com ❤️ para análise avançada de dados esportivos*
 
 ⭐ Se este projeto te ajudou, considere dar uma estrela!

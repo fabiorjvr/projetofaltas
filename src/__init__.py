@@ -1,0 +1,1 @@
+# Declara src/ como pacote Python
